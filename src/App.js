@@ -1,30 +1,47 @@
 import React from "react";
-import store from "./store";
-import { Provider } from "react-redux";
-import { BrowserRouter, Route, Link } from "react-router-dom";
-import HomeScreen from "./screens/HomeScreen";
-import AdminScreen from "./screens/AdminScreen";
+import { connect } from "react-redux";
+import fetch_user from "./actions/fetchUsers";
 
 class App extends React.Component {
+  constructor(props) {
+    super(props)
+  
+    this.state = {
+    }
+  }
+  
+  fetchUser = () => {
+    const {fetchUserData} = this.props;
+    fetchUserData();
+  };
   render() {
+    const {users} = this.props;
     return (
-      <Provider store={store}>
-        <BrowserRouter>
-          <div className="grid-container">
-            <header>
-              <Link to="/">React Shopping Cart</Link>
-              <Link to="/admin">Admin</Link>
-            </header>
-            <main>
-              <Route path="/admin" component={AdminScreen} />
-              <Route path="/" component={HomeScreen} exact />
-            </main>
-            <footer>All right is reserved.</footer>
-          </div>
-        </BrowserRouter>
-      </Provider>
+      <div className="App">
+        <button onClick={this.fetchUser}>FetchUsers</button>
+        {users.length === 0 ?
+        <p>No Data Found</p> :
+        <div>
+          {users.map((user)=>(
+            <h3>{user.name}</h3>
+          ))}
+        </div>
+        }
+      </div>
     );
   }
 }
 
-export default App;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchUserData: () => dispatch(fetch_user())
+  };
+};
+
+const mapStateToProps = (state) => {
+  return {
+    users : state && state.users
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
